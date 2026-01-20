@@ -461,9 +461,9 @@ export default function HomePage() {
             {/* STUDENT FORM */}
             {activeTab === 'student' && (
               <form onSubmit={handleStudentSubmit} className="space-y-2 animate-fadeIn">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
                   {/* Name */}
-                  <div>
+                  {/* <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                     <input
                       type="text"
@@ -473,7 +473,7 @@ export default function HomePage() {
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
                       required
                     />
-                  </div>
+                  </div> */}
 
                   {/* Email */}
                   <div>
@@ -627,8 +627,8 @@ export default function HomePage() {
             {/* PARENT FORM */}
             {activeTab === 'parent' && (
               <form onSubmit={handleParentSubmit} className="space-y-2 animate-fadeIn">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {/* Name */}
+                <div>
+                  {/* Name
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
                     <input
@@ -639,7 +639,7 @@ export default function HomePage() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
                       required
                     />
-                  </div>
+                  </div> */}
 
                   {/* Email */}
                   <div>
@@ -649,7 +649,7 @@ export default function HomePage() {
                       value={parentData.email}
                       onChange={(e) => setParentData({ ...parentData, email: e.target.value })}
                       placeholder="parent@edumind.com"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                       required
                     />
                   </div>
