@@ -7,7 +7,6 @@ import {
   Bus,
   DollarSign,
   CalendarCheck,
-  Wrench,
   LogOut,
   Bell,
   ChevronLeft,
@@ -88,14 +87,13 @@ const CalendarPage = ({ onLogout }) => {
     // Add days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const isToday = new Date().getFullYear() === currentYear &&
-                     new Date().getMonth() === monthIndex &&
-                     new Date().getDate() === day;
+        new Date().getMonth() === monthIndex &&
+        new Date().getDate() === day;
       days.push(
         <div
           key={day}
-          className={`h-8 w-8 flex items-center justify-center text-sm rounded-full cursor-pointer hover:bg-indigo-100 transition-colors ${
-            isToday ? 'bg-indigo-600 text-white font-bold' : 'text-gray-700'
-          }`}
+          className={`h-8 w-8 flex items-center justify-center text-sm rounded-full cursor-pointer hover:bg-indigo-100 transition-colors ${isToday ? 'bg-indigo-600 text-white font-bold' : 'text-gray-700'
+            }`}
         >
           {day}
         </div>

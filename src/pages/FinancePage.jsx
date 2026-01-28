@@ -7,7 +7,6 @@ import {
   Bus,
   DollarSign,
   CalendarCheck,
-  Wrench,
   LogOut,
   Search,
   Bell,
@@ -171,7 +170,7 @@ const FinancePage = ({ onLogout }) => {
   const handleDownloadReport = () => {
     // Define headers
     const headers = ['Student Name', 'Class', 'Pending Fees', 'Remaining %', 'Due Date'];
-    
+
     // Convert data to CSV rows
     const csvRows = [
       headers.join(','), // Header row
@@ -214,7 +213,7 @@ const FinancePage = ({ onLogout }) => {
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      
+
       const pngUrl = canvas.toDataURL('image/png');
       const downloadLink = document.createElement('a');
       downloadLink.href = pngUrl;
@@ -252,48 +251,48 @@ const FinancePage = ({ onLogout }) => {
     return (
       <div className="w-full h-full" id={id}>
         <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="w-full h-full overflow-visible">
-           <defs>
-             <linearGradient id={`barGradient-${id}`} x1="0" y1="0" x2="0" y2="1">
-               <stop offset="0%" stopColor="#38bdf8" />
-               <stop offset="100%" stopColor="#0284c7" />
-             </linearGradient>
-           </defs>
-           {/* Y-Axis Labels & Grid */}
-           {yLabels.map((label, i) => {
-             const y = padding.top + (chartHeight / yAxisTicks) * i;
-             return (
-               <g key={i}>
-                 <text x={padding.left - 4} y={y} textAnchor="end" alignmentBaseline="middle" fontSize="3.5" fill="#9ca3af">{label}</text>
-                 <line x1={padding.left} y1={y} x2={width} y2={y} stroke="#f3f4f6" strokeWidth="0.5" />
-               </g>
-             );
-           })}
+          <defs>
+            <linearGradient id={`barGradient-${id}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#38bdf8" />
+              <stop offset="100%" stopColor="#0284c7" />
+            </linearGradient>
+          </defs>
+          {/* Y-Axis Labels & Grid */}
+          {yLabels.map((label, i) => {
+            const y = padding.top + (chartHeight / yAxisTicks) * i;
+            return (
+              <g key={i}>
+                <text x={padding.left - 4} y={y} textAnchor="end" alignmentBaseline="middle" fontSize="3.5" fill="#9ca3af">{label}</text>
+                <line x1={padding.left} y1={y} x2={width} y2={y} stroke="#f3f4f6" strokeWidth="0.5" />
+              </g>
+            );
+          })}
 
-           {/* Bars */}
-           {data.map((d, i) => {
-             const val = d[dataKey];
-             const barHeight = (val / niceMaxVal) * chartHeight;
-             const x = padding.left + (chartWidth / data.length) * i + gap / 2;
-             const y = padding.top + chartHeight - barHeight;
+          {/* Bars */}
+          {data.map((d, i) => {
+            const val = d[dataKey];
+            const barHeight = (val / niceMaxVal) * chartHeight;
+            const x = padding.left + (chartWidth / data.length) * i + gap / 2;
+            const y = padding.top + chartHeight - barHeight;
 
-             return (
-               <g key={i} onMouseEnter={() => setHoveredIndex(i)} onMouseLeave={() => setHoveredIndex(null)}>
-                 <rect x={x} y={y} width={barWidth} height={barHeight} fill={`url(#barGradient-${id})`} rx="2" className="transition-all duration-300 hover:opacity-80 cursor-pointer" />
-                 {(data.length < 8 || i % 2 === 0) && (
-                  <text x={x + barWidth/2} y={height - 5} textAnchor="middle" fontSize="3.5" fill="#9ca3af">{d.month}</text>
-                 )}
-                 {hoveredIndex === i && (
-                   <g>
-                     <rect x={x + barWidth/2 - 12} y={y - 12} width="24" height="8" rx="2" fill="#1f2937" />
-                     <text x={x + barWidth/2} y={y - 7} textAnchor="middle" fill="white" fontSize="3" alignmentBaseline="middle">${val.toLocaleString()}</text>
-                     <polygon points={`${x + barWidth/2 - 2},${y-4} ${x + barWidth/2 + 2},${y-4} ${x + barWidth/2},${y-2}`} fill="#1f2937" />
-                   </g>
-                 )}
-               </g>
-             );
-           })}
-           <line x1={padding.left} y1={padding.top} x2={padding.left} y2={height - padding.bottom} stroke="transparent" strokeWidth="0" />
-           <line x1={padding.left} y1={height - padding.bottom} x2={width} y2={height - padding.bottom} stroke="#e5e7eb" strokeWidth="0.5" />
+            return (
+              <g key={i} onMouseEnter={() => setHoveredIndex(i)} onMouseLeave={() => setHoveredIndex(null)}>
+                <rect x={x} y={y} width={barWidth} height={barHeight} fill={`url(#barGradient-${id})`} rx="2" className="transition-all duration-300 hover:opacity-80 cursor-pointer" />
+                {(data.length < 8 || i % 2 === 0) && (
+                  <text x={x + barWidth / 2} y={height - 5} textAnchor="middle" fontSize="3.5" fill="#9ca3af">{d.month}</text>
+                )}
+                {hoveredIndex === i && (
+                  <g>
+                    <rect x={x + barWidth / 2 - 12} y={y - 12} width="24" height="8" rx="2" fill="#1f2937" />
+                    <text x={x + barWidth / 2} y={y - 7} textAnchor="middle" fill="white" fontSize="3" alignmentBaseline="middle">${val.toLocaleString()}</text>
+                    <polygon points={`${x + barWidth / 2 - 2},${y - 4} ${x + barWidth / 2 + 2},${y - 4} ${x + barWidth / 2},${y - 2}`} fill="#1f2937" />
+                  </g>
+                )}
+              </g>
+            );
+          })}
+          <line x1={padding.left} y1={padding.top} x2={padding.left} y2={height - padding.bottom} stroke="transparent" strokeWidth="0" />
+          <line x1={padding.left} y1={height - padding.bottom} x2={width} y2={height - padding.bottom} stroke="#e5e7eb" strokeWidth="0.5" />
         </svg>
       </div>
     );
@@ -332,7 +331,7 @@ const FinancePage = ({ onLogout }) => {
 
       {/* Overlay for mobile */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
@@ -386,8 +385,8 @@ const FinancePage = ({ onLogout }) => {
                 <div className="flex gap-2">
                   <div className="flex flex-col">
                     <label className="text-xs text-gray-500 mb-1">Start Date</label>
-                    <input 
-                      type="date" 
+                    <input
+                      type="date"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
                       className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-100"
@@ -395,8 +394,8 @@ const FinancePage = ({ onLogout }) => {
                   </div>
                   <div className="flex flex-col">
                     <label className="text-xs text-gray-500 mb-1">End Date</label>
-                    <input 
-                      type="date" 
+                    <input
+                      type="date"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
                       className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-100"
@@ -480,7 +479,7 @@ const FinancePage = ({ onLogout }) => {
                       className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-100"
                     />
                   </div>
-                  <button 
+                  <button
                     onClick={() => setShowAddModal(true)}
                     className="bg-purple-600 text-white p-2 rounded-lg hover:bg-purple-700 transition-colors flex-shrink-0"
                     title="Add Defaulter"
@@ -570,11 +569,10 @@ const FinancePage = ({ onLogout }) => {
                     <button
                       key={index + 1}
                       onClick={() => setCurrentPage(index + 1)}
-                      className={`px-3 py-1 text-sm border rounded-lg ${
-                        currentPage === index + 1
+                      className={`px-3 py-1 text-sm border rounded-lg ${currentPage === index + 1
                           ? 'bg-purple-600 text-white border-purple-600'
                           : 'border-gray-200 hover:bg-gray-50 text-gray-600'
-                      }`}
+                        }`}
                     >
                       {index + 1}
                     </button>
@@ -611,7 +609,7 @@ const FinancePage = ({ onLogout }) => {
                   required
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
                   value={newDefaulter.name}
-                  onChange={(e) => setNewDefaulter({...newDefaulter, name: e.target.value})}
+                  onChange={(e) => setNewDefaulter({ ...newDefaulter, name: e.target.value })}
                   placeholder="e.g., John Doe"
                 />
               </div>
@@ -622,7 +620,7 @@ const FinancePage = ({ onLogout }) => {
                   required
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
                   value={newDefaulter.class}
-                  onChange={(e) => setNewDefaulter({...newDefaulter, class: e.target.value})}
+                  onChange={(e) => setNewDefaulter({ ...newDefaulter, class: e.target.value })}
                   placeholder="e.g., 10-A"
                 />
               </div>
@@ -633,7 +631,7 @@ const FinancePage = ({ onLogout }) => {
                   required
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
                   value={newDefaulter.pendingFees}
-                  onChange={(e) => setNewDefaulter({...newDefaulter, pendingFees: e.target.value})}
+                  onChange={(e) => setNewDefaulter({ ...newDefaulter, pendingFees: e.target.value })}
                   placeholder="e.g., 5000"
                 />
               </div>
@@ -644,7 +642,7 @@ const FinancePage = ({ onLogout }) => {
                   required
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
                   value={newDefaulter.percentage}
-                  onChange={(e) => setNewDefaulter({...newDefaulter, percentage: e.target.value})}
+                  onChange={(e) => setNewDefaulter({ ...newDefaulter, percentage: e.target.value })}
                   placeholder="e.g., 25"
                 />
               </div>
@@ -655,7 +653,7 @@ const FinancePage = ({ onLogout }) => {
                   required
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
                   value={newDefaulter.dueDate}
-                  onChange={(e) => setNewDefaulter({...newDefaulter, dueDate: e.target.value})}
+                  onChange={(e) => setNewDefaulter({ ...newDefaulter, dueDate: e.target.value })}
                 />
               </div>
               <button

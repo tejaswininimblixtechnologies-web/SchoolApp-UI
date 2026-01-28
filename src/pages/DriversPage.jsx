@@ -7,7 +7,6 @@ import {
   Bus,
   DollarSign,
   CalendarCheck,
-  Wrench,
   LogOut,
   Search,
   Bell,
@@ -213,7 +212,7 @@ const DriversPage = ({ onLogout }) => {
 
       {/* Overlay for mobile */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
@@ -299,7 +298,7 @@ const DriversPage = ({ onLogout }) => {
             <div className="bg-white p-6 rounded-2xl shadow-sm">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-bold text-gray-900">Driver Management</h3>
-                <button 
+                <button
                   onClick={openAddModal}
                   className="bg-purple-600 text-white px-4 py-2 rounded-xl font-semibold hover:bg-purple-700 transition-colors flex items-center gap-2"
                 >
@@ -348,13 +347,13 @@ const DriversPage = ({ onLogout }) => {
                         </td>
                         <td className="py-4 px-4">
                           <div className="flex items-center gap-2">
-                            <button 
+                            <button
                               onClick={() => openEditModal(driver)}
                               className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             >
                               <Edit size={18} />
                             </button>
-                            <button 
+                            <button
                               onClick={() => confirmDelete(driver)}
                               className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             >
@@ -390,7 +389,7 @@ const DriversPage = ({ onLogout }) => {
                   required
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
                   value={newDriver.name}
-                  onChange={(e) => setNewDriver({...newDriver, name: e.target.value})}
+                  onChange={(e) => setNewDriver({ ...newDriver, name: e.target.value })}
                   placeholder="e.g., John Doe"
                 />
               </div>
@@ -401,7 +400,7 @@ const DriversPage = ({ onLogout }) => {
                   required
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
                   value={newDriver.route}
-                  onChange={(e) => setNewDriver({...newDriver, route: e.target.value})}
+                  onChange={(e) => setNewDriver({ ...newDriver, route: e.target.value })}
                   placeholder="e.g., Route A - Downtown"
                 />
               </div>
@@ -412,7 +411,7 @@ const DriversPage = ({ onLogout }) => {
                   required
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
                   value={newDriver.vehicle}
-                  onChange={(e) => setNewDriver({...newDriver, vehicle: e.target.value})}
+                  onChange={(e) => setNewDriver({ ...newDriver, vehicle: e.target.value })}
                   placeholder="e.g., Bus-101"
                 />
               </div>
@@ -421,7 +420,7 @@ const DriversPage = ({ onLogout }) => {
                 <select
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
                   value={newDriver.status}
-                  onChange={(e) => setNewDriver({...newDriver, status: e.target.value})}
+                  onChange={(e) => setNewDriver({ ...newDriver, status: e.target.value })}
                 >
                   <option value="Active">Active</option>
                   <option value="Inactive">Inactive</option>
