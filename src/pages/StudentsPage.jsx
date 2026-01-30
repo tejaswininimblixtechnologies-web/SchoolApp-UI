@@ -51,7 +51,6 @@ const StudentsPage = ({ onLogout }) => {
   const [createdCredentials, setCreatedCredentials] = useState(null);
   const [isCopied, setIsCopied] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-ie
   const itemsPerPage = 5;
   const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
 
