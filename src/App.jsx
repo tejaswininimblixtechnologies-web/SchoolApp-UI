@@ -5,9 +5,11 @@ import HomePage from './pages/HomePage';
 import SignUpPage from './pages/SignUpPage';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import ChangePasswordPage from './pages/ChangePasswordPage';
 import StudentDashboard from './pages/StudentDashboard';
 import ParentDashboard from './pages/ParentDashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
+import NonTeachingStaffDashboard from './pages/NonTeachingStaffDashboard';
 import UserManagement from './pages/UserManagement';
 import ModernAdminDashboard from './pages/ModernAdminDashboard';
 import StudentsPage from './pages/StudentsPage';
@@ -22,14 +24,20 @@ import DriversPage from './pages/DriversPage';
 import CalendarPage from './pages/CalendarPage';
 import Settings from './pages/Settings';
 import AdminProfilePage from './pages/AdminProfilePage';
+import { logout } from './utils/auth';
 
 
 function App() {
   const handleLogout = () => {
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userEmail');
-    window.location.href = '/';
+    logout();
+  };
+
+  const StaffDashboardWrapper = ({ onLogout }) => {
+    const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (user.staffType === 'teaching' || ['Principal', 'HOD', 'Class Teacher', 'Subject Teacher', 'Teacher'].includes(user.designation)) {
+      return <TeacherDashboard onLogout={onLogout} />;
+    }
+    return <NonTeachingStaffDashboard onLogout={onLogout} />;
   };
 
   return (
@@ -39,18 +47,19 @@ function App() {
         <Route path="/" element={<HomePage />} />
         
         {/* Public Routes */}
-        <Route path="/signup-page" element={<SignUpPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/change-password" element={<ChangePasswordPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
         
         {/* Protected Routes */}
-        <Route 
-          path="/admin" 
+        <Route
+          path="/admin"
           element={
             <ProtectedRoute requiredRole="admin">
               <ModernAdminDashboard onLogout={handleLogout} />
             </ProtectedRoute>
-          } 
+          }
         />
         <Route 
           path="/student" 
@@ -68,16 +77,33 @@ function App() {
             </ProtectedRoute>
           } 
         />
-        <Route 
-          path="/teacher" 
+        <Route
+          path="/teacher"
           element={
-            <ProtectedRoute requiredRole="staff">
+            <ProtectedRoute requiredRole={['teacher', 'staff']}>
               <TeacherDashboard onLogout={handleLogout} />
             </ProtectedRoute>
-          } 
+          }
+        />
+        <Route
+          path="/staff"
+          element={
+            <ProtectedRoute requiredRole="staff">
+              <NonTeachingStaffDashboard onLogout={handleLogout} />
+              <StaffDashboardWrapper onLogout={handleLogout} />
+            </ProtectedRoute>
+          }
         />
         <Route
           path="/user-management"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <UserManagement onLogout={handleLogout} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/users"
           element={
             <ProtectedRoute requiredRole="admin">
               <UserManagement onLogout={handleLogout} />

@@ -1,46 +1,22 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, ArrowLeft, CheckCircle, Lock } from 'lucide-react';
+import { useDebounce } from '../utils/useDebounce';
 
 export default function ResetPassword() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState(0);
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const calculatePasswordStrength = (pwd) => {
-    let strength = 0;
-    if (pwd.length >= 8) strength += 25;
-    if (/[a-z]/.test(pwd)) strength += 25;
-    if (/[A-Z]/.test(pwd)) strength += 25;
-    if (/[0-9]/.test(pwd) || /[!@#$%^&*]/.test(pwd)) strength += 25;
-    return strength;
-  };
-
   const handlePasswordChange = (e) => {
     const pwd = e.target.value;
     setPassword(pwd);
-    setPasswordStrength(calculatePasswordStrength(pwd));
     if (errors.password) setErrors({ ...errors, password: '' });
-  };
-
-  const getPasswordStrengthColor = () => {
-    if (passwordStrength < 25) return 'bg-red-500';
-    if (passwordStrength < 50) return 'bg-orange-500';
-    if (passwordStrength < 75) return 'bg-yellow-500';
-    return 'bg-green-500';
-  };
-
-  const getPasswordStrengthText = () => {
-    if (passwordStrength < 25) return 'Weak';
-    if (passwordStrength < 50) return 'Fair';
-    if (passwordStrength < 75) return 'Good';
-    return 'Strong';
   };
 
   const handleSubmit = async (e) => {
@@ -49,10 +25,6 @@ export default function ResetPassword() {
 
     if (!password) {
       newErrors.password = 'Password is required';
-    } else if (password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
-    } else if (passwordStrength < 50) {
-      newErrors.password = 'Password is too weak. Use uppercase, lowercase, numbers, and symbols.';
     }
 
     if (!confirmPassword) {
@@ -130,7 +102,7 @@ export default function ResetPassword() {
         {/* Back Button */}
         <button
           onClick={() => navigate('/forgot-password')}
-          className="flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-6 font-medium"
+          className="flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-6 font-medium transition-colors duration-200"
         >
           <ArrowLeft size={20} />
           Back to Forgot Password
@@ -169,28 +141,11 @@ export default function ResetPassword() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-3.5 text-gray-500 hover:text-gray-700"
+                className="absolute right-4 top-3.5 text-gray-500 hover:text-gray-700 transition-colors duration-200"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
-
-            {/* Password Strength Indicator */}
-            {password && (
-              <div className="mt-2">
-                <div className="flex gap-2 items-center">
-                  <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full transition-all ${getPasswordStrengthColor()}`}
-                      style={{ width: `${passwordStrength}%` }}
-                    ></div>
-                  </div>
-                  <span className="text-xs font-semibold text-gray-600">
-                    {getPasswordStrengthText()}
-                  </span>
-                </div>
-              </div>
-            )}
 
             {errors.password && (
               <p className="text-red-500 text-sm mt-1">{errors.password}</p>
@@ -230,25 +185,6 @@ export default function ResetPassword() {
             )}
           </div>
 
-          {/* Password Requirements */}
-          <div className="bg-blue-50 rounded-lg p-4 mt-6">
-            <p className="text-xs font-semibold text-blue-900 mb-2">Password Requirements:</p>
-            <ul className="text-xs text-blue-800 space-y-1">
-              <li className={password.length >= 8 ? 'text-green-600' : ''}>
-                ✓ At least 8 characters
-              </li>
-              <li className={/[a-z]/.test(password) ? 'text-green-600' : ''}>
-                ✓ Lowercase letters (a-z)
-              </li>
-              <li className={/[A-Z]/.test(password) ? 'text-green-600' : ''}>
-                ✓ Uppercase letters (A-Z)
-              </li>
-              <li className={/[0-9]/.test(password) ? 'text-green-600' : ''}>
-                ✓ Numbers (0-9)
-              </li>
-            </ul>
-          </div>
-
           {/* Submit Button */}
           <button
             type="submit"
@@ -265,7 +201,7 @@ export default function ResetPassword() {
 
         {/* Footer */}
         <p className="text-xs text-gray-500 text-center mt-6">
-          Remember your password? <button onClick={() => navigate('/')} className="text-blue-600 hover:text-blue-700 font-semibold">Login here</button>
+          Remember your password? <button onClick={() => navigate('/')} className="text-blue-600 hover:text-blue-700 font-semibold transition-colors duration-200">Login here</button>
         </p>
       </div>
     </div>

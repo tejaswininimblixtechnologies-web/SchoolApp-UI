@@ -20,12 +20,16 @@ import {
   AlertCircle,
   Menu,
   Settings,
-  Download
+  Download,
+  CheckCircle,
+  Copy,
+  ShieldCheck
 } from 'lucide-react';
+import { validateAuth, logout } from '../utils/auth';
 
 const StudentsPage = ({ onLogout }) => {
   const navigate = useNavigate();
-  const [adminName, setAdminName] = useState('Admin User');
+  const [adminName, setAdminName] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('Newest');
   const [selectedGrade, setSelectedGrade] = useState('All Grades');
@@ -36,14 +40,53 @@ const StudentsPage = ({ onLogout }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newStudent, setNewStudent] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '',
-    grade: '',
-    parentName: ''
+    rollNumber: '',
+    className: ''
   });
+  const [showCredentialsModal, setShowCredentialsModal] = useState(false);
+  const [createdCredentials, setCreatedCredentials] = useState(null);
+  const [isCopied, setIsCopied] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+ie
   const itemsPerPage = 5;
+  const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
+
+  // Fetch students from API
+  React.useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/users');
+        const result = await response.json();
+        if (result.success) {
+          const studentUsers = result.users.filter(user => user.role === 'student');
+          // Map backend user format to frontend display format if necessary, 
+          // or update the render logic to use backend fields.
+          // For now, let's map it to match the existing state structure to minimize render changes
+          const mappedStudents = studentUsers.map(user => ({
+            id: user.rollNumber || user.id, // Prefer roll number for ID display
+            name: `${user.firstName} ${user.lastName}`,
+            avatar: user.profileImage || `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=5A4FCF&color=fff`,
+            date: new Date(user.createdAt || Date.now()).toISOString().split('T')[0],
+            parentName: user.parentName || 'N/A', // Backend might not link parent name directly on user object yet
+
+            city: user.city || 'N/A',
+                grade: user.className || 'N/A', // Access className from user
+            contact: { phone: user.phone || 'N/A', email: user.email || 'N/A' },
+            status: user.status // Keep track of status
+          }));
+          setStudents(mappedStudents);
+        }
+      } catch (error) {
+        console.error('Error fetching students:', error);
+      }
+    };
+
+    fetchStudents();
+  }, []);
 
   React.useEffect(() => {
     const fetchAdminName = () => {
@@ -56,6 +99,8 @@ const StudentsPage = ({ onLogout }) => {
         const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
         if (registeredUsers.admin && registeredUsers.admin.firstName) {
           setAdminName(`${registeredUsers.admin.firstName} ${registeredUsers.admin.lastName}`);
+        } else {
+          setAdminName('Admin');
         }
       } catch (error) {
         console.error('Error fetching admin name:', error);
@@ -65,112 +110,26 @@ const StudentsPage = ({ onLogout }) => {
   }, []);
 
   React.useEffect(() => {
+    const fetchPendingRequests = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/student-requests');
+        const result = await response.json();
+        if (result.success) {
+          setPendingRequestsCount(result.requests.filter(req => req.status === 'pending').length);
+        }
+      } catch (error) {
+        console.error('Error fetching pending requests:', error);
+      }
+    };
+    fetchPendingRequests();
+  }, []);
+
+  React.useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedFilter, selectedGrade]);
 
   // Sample student data
-  const [students, setStudents] = useState([
-    {
-      id: 'STU001',
-      name: 'Alice Johnson',
-      avatar: 'https://ui-avatars.com/api/?name=Alice+Johnson&background=5A4FCF&color=fff',
-      date: '2023-10-15',
-      parentName: 'Robert Johnson',
-      city: 'New York',
-      grade: 'Grade 10',
-      contact: { phone: '+1-555-0123', email: 'alice.johnson@email.com' }
-    },
-    {
-      id: 'STU002',
-      name: 'Michael Chen',
-      avatar: 'https://ui-avatars.com/api/?name=Michael+Chen&background=5A4FCF&color=fff',
-      date: '2023-09-20',
-      parentName: 'Sarah Chen',
-      city: 'Los Angeles',
-      grade: 'Grade 9',
-      contact: { phone: '+1-555-0124', email: 'michael.chen@email.com' }
-    },
-    {
-      id: 'STU003',
-      name: 'Emma Davis',
-      avatar: 'https://ui-avatars.com/api/?name=Emma+Davis&background=5A4FCF&color=fff',
-      date: '2023-08-10',
-      parentName: 'James Davis',
-      city: 'Chicago',
-      grade: 'Grade 11',
-      contact: { phone: '+1-555-0125', email: 'emma.davis@email.com' }
-    },
-    {
-      id: 'STU004',
-      name: 'Ryan Wilson',
-      avatar: 'https://ui-avatars.com/api/?name=Ryan+Wilson&background=5A4FCF&color=fff',
-      date: '2023-07-05',
-      parentName: 'Lisa Wilson',
-      city: 'Houston',
-      grade: 'Grade 8',
-      contact: { phone: '+1-555-0126', email: 'ryan.wilson@email.com' }
-    },
-    {
-      id: 'STU005',
-      name: 'Sophia Brown',
-      avatar: 'https://ui-avatars.com/api/?name=Sophia+Brown&background=5A4FCF&color=fff',
-      date: '2023-06-15',
-      parentName: 'David Brown',
-      city: 'Phoenix',
-      grade: 'Grade 12',
-      contact: { phone: '+1-555-0127', email: 'sophia.brown@email.com' }
-    },
-    {
-      id: 'STU006',
-      name: 'Daniel Lee',
-      avatar: 'https://ui-avatars.com/api/?name=Daniel+Lee&background=5A4FCF&color=fff',
-      date: '2023-05-20',
-      parentName: 'Christopher Lee',
-      city: 'San Francisco',
-      grade: 'Grade 10',
-      contact: { phone: '+1-555-0128', email: 'daniel.lee@email.com' }
-    },
-    {
-      id: 'STU007',
-      name: 'Olivia Martinez',
-      avatar: 'https://ui-avatars.com/api/?name=Olivia+Martinez&background=5A4FCF&color=fff',
-      date: '2023-04-12',
-      parentName: 'Jennifer Martinez',
-      city: 'Miami',
-      grade: 'Grade 9',
-      contact: { phone: '+1-555-0129', email: 'olivia.martinez@email.com' }
-    },
-    {
-      id: 'STU008',
-      name: 'Lucas Taylor',
-      avatar: 'https://ui-avatars.com/api/?name=Lucas+Taylor&background=5A4FCF&color=fff',
-      date: '2023-03-25',
-      parentName: 'William Taylor',
-      city: 'Seattle',
-      grade: 'Grade 11',
-      contact: { phone: '+1-555-0130', email: 'lucas.taylor@email.com' }
-    },
-    {
-      id: 'STU009',
-      name: 'Ava Anderson',
-      avatar: 'https://ui-avatars.com/api/?name=Ava+Anderson&background=5A4FCF&color=fff',
-      date: '2023-02-18',
-      parentName: 'Elizabeth Anderson',
-      city: 'Boston',
-      grade: 'Grade 8',
-      contact: { phone: '+1-555-0131', email: 'ava.anderson@email.com' }
-    },
-    {
-      id: 'STU010',
-      name: 'Ethan Jackson',
-      avatar: 'https://ui-avatars.com/api/?name=Ethan+Jackson&background=5A4FCF&color=fff',
-      date: '2023-01-30',
-      parentName: 'Patricia Jackson',
-      city: 'Denver',
-      grade: 'Grade 12',
-      contact: { phone: '+1-555-0132', email: 'ethan.jackson@email.com' }
-    },
-  ]);
+  const [students, setStudents] = useState([]);
 
   const filteredStudents = students.filter(student => {
     const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -233,17 +192,76 @@ const StudentsPage = ({ onLogout }) => {
     setStudentToDelete(null);
   };
 
-  const handleAddStudent = (e) => {
+  const handleAddStudent = async (e) => {
     e.preventDefault();
-    const student = {
-      id: `STU00${students.length + 1}`,
-      ...newStudent,
-      avatar: `https://ui-avatars.com/api/?name=${newStudent.name}&background=0EA5E9&color=fff`,
-      date: new Date().toISOString().split('T')[0]
+
+    // Validate authentication before proceeding
+    const authValidation = validateAuth();
+    if (!authValidation.isValid) {
+      if (authValidation.error === 'Session expired. Please login again.') {
+        alert('Your session has expired. Please login again.');
+        logout();
+        return;
+      }
+      alert(authValidation.error);
+      return;
+    }
+
+    const userData = {
+      firstName: newStudent.firstName,
+      lastName: newStudent.lastName,
+      email: newStudent.email,
+      phone: newStudent.phone,
+      rollNumber: newStudent.rollNumber,
+      className: newStudent.className,
+      role: 'student'
     };
-    setStudents([...students, student]);
-    setShowAddModal(false);
-    setNewStudent({ name: '', email: '', phone: '', grade: '', parentName: '' });
+
+    try {
+      const response = await fetch('http://localhost:5000/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authValidation.token}`,
+        },
+        body: JSON.stringify(userData),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        console.log('✅ Student registered successfully!');
+        setCreatedCredentials({ email: newStudent.email, password: 'Sent via email', role: 'Student' });
+        setShowCredentialsModal(true);
+
+        // Also add to local students list for display
+        const student = {
+          id: `STU00${students.length + 1}`,
+          name: `${newStudent.firstName} ${newStudent.lastName}`,
+          avatar: `https://ui-avatars.com/api/?name=${newStudent.firstName}+${newStudent.lastName}&background=0EA5E9&color=fff`,
+          date: new Date().toISOString().split('T')[0],
+          parentName: 'N/A', // Parent info not collected here
+          city: 'N/A',
+          grade: newStudent.className,
+          contact: { phone: newStudent.phone, email: newStudent.email }
+        };
+        setStudents([...students, student]);
+
+        setShowAddModal(false);
+        setNewStudent({ firstName: '', lastName: '', email: '', phone: '', rollNumber: '', className: '' });
+      } else {
+        if (result.error === 'Invalid token or authorization error.' ||
+            result.error === 'Unauthorized. Admin access required.') {
+          alert('Your session has expired. Please login again.');
+          logout();
+          return;
+        }
+        alert('Failed to register student: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Error registering student:', error);
+      alert('Failed to connect to server.');
+    }
   };
 
   return (
@@ -256,13 +274,13 @@ const StudentsPage = ({ onLogout }) => {
 
         <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto custom-scrollbar">
           <NavItem icon={<LayoutDashboard size={20} />} label="Dashboard" onClick={() => navigate('/admin')} />
+          <NavItem icon={<ShieldCheck size={20} />} label="Verification" onClick={() => navigate('/admin', { state: { activeView: 'verification' } })} badge={pendingRequestsCount} />
           <NavItem icon={<GraduationCap size={20} />} label="Students" active onClick={() => navigate('/admin/students')} />
           <NavItem icon={<Users size={20} />} label="Teachers" onClick={() => navigate('/admin/teachers')} />
           <NavItem icon={<User size={20} />} label="Parents" onClick={() => navigate('/admin/parents')} />
           <NavItem icon={<Bus size={20} />} label="Driver & Vehicles" onClick={() => navigate('/admin/drivers')} />
           <NavItem icon={<DollarSign size={20} />} label="Finance" onClick={() => navigate('/admin/finance')} />
           <NavItem icon={<CalendarCheck size={20} />} label="Attendance" onClick={() => navigate('/admin/attendance')} />
-          <NavItem icon={<Wrench size={20} />} label="Maintenance" onClick={() => navigate('/admin/maintenance')} />
           <NavItem icon={<Settings size={20} />} label="Settings" onClick={() => navigate('/admin/settings')} />
         </nav>
 
@@ -364,13 +382,6 @@ const StudentsPage = ({ onLogout }) => {
                 <button onClick={handleExportCSV} className="bg-white border border-gray-200 text-gray-600 px-4 py-2.5 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2">
                   <Download size={18} />
                   Export
-                </button>
-                <button 
-                  onClick={() => setShowAddModal(true)}
-                  className="bg-primary text-white px-6 py-2.5 rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center gap-2"
-                >
-                  <Plus size={18} />
-                  New Student
                 </button>
               </div>
             </div>
@@ -602,49 +613,80 @@ const StudentsPage = ({ onLogout }) => {
               </button>
             </div>
             <form onSubmit={handleAddStudent} className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                <input
-                  type="text"
-                  required
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
-                  value={newStudent.name}
-                  onChange={(e) => setNewStudent({...newStudent, name: e.target.value})}
-                  placeholder="e.g., John Doe"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
+                  <input
+                    type="text"
+                    required
+                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                    value={newStudent.firstName}
+                    onChange={(e) => setNewStudent({...newStudent, firstName: e.target.value})}
+                    placeholder="John"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
+                  <input
+                    type="text"
+                    required
+                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                    value={newStudent.lastName}
+                    onChange={(e) => setNewStudent({...newStudent, lastName: e.target.value})}
+                    placeholder="Doe"
+                  />
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input
-                  type="email"
-                  required
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
-                  value={newStudent.email}
-                  onChange={(e) => setNewStudent({...newStudent, email: e.target.value})}
-                  placeholder="e.g., john@school.edu"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
+                  <input
+                    type="email"
+                    required
+                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                    value={newStudent.email}
+                    onChange={(e) => setNewStudent({...newStudent, email: e.target.value})}
+                    placeholder="john@example.com"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+                  <input
+                    type="tel"
+                    required
+                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                    value={newStudent.phone}
+                    onChange={(e) => setNewStudent({...newStudent, phone: e.target.value})}
+                    placeholder="9876543210"
+                  />
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Grade</label>
-                <input
-                  type="text"
-                  required
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
-                  value={newStudent.grade}
-                  onChange={(e) => setNewStudent({...newStudent, grade: e.target.value})}
-                  placeholder="e.g., Grade 10"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Parent Name</label>
-                <input
-                  type="text"
-                  required
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
-                  value={newStudent.parentName}
-                  onChange={(e) => setNewStudent({...newStudent, parentName: e.target.value})}
-                  placeholder="e.g., Robert Doe"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Roll Number *</label>
+                  <input
+                    type="text"
+                    required
+                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                    value={newStudent.rollNumber}
+                    onChange={(e) => setNewStudent({...newStudent, rollNumber: e.target.value})}
+                    placeholder="12345"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Class *</label>
+                  <select
+                    required
+                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                    value={newStudent.className}
+                    onChange={(e) => setNewStudent({...newStudent, className: e.target.value})}
+                  >
+                    <option value="">Select Class</option>
+                    {['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'].map((cls) => (
+                      <option key={cls} value={cls}>{cls}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
               <button
                 type="submit"
@@ -656,18 +698,71 @@ const StudentsPage = ({ onLogout }) => {
           </div>
         </div>
       )}
+
+      {/* Credentials Modal */}
+      {showCredentialsModal && createdCredentials && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+            <div className="flex flex-col items-center text-center mb-6">
+              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                <CheckCircle className="text-green-600" size={24} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Registration Successful!</h3>
+              <p className="text-gray-600 mb-4">
+                Credentials have been generated.
+              </p>
+              
+              <div className="w-full bg-gray-50 rounded-xl p-4 text-left space-y-3 border border-gray-100">
+                <div>
+                  <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">Login ID</p>
+                  <p className="font-mono text-gray-900 font-medium">{createdCredentials.email}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">Password</p>
+                  <div className="flex items-center justify-between gap-2 mt-1">
+                    <p className="font-mono text-gray-900 font-bold bg-white px-2 py-1 rounded border border-gray-200">{createdCredentials.password}</p>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(createdCredentials.password);
+                        setIsCopied(true);
+                        setTimeout(() => setIsCopied(false), 2000);
+                      }}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${isCopied ? 'text-green-600 bg-green-50 hover:bg-green-100' : 'text-indigo-600 hover:bg-indigo-50'}`}
+                      title="Copy Password"
+                    >
+                      {isCopied ? <CheckCircle size={16} /> : <Copy size={16} />}
+                      {isCopied ? 'Copied!' : 'Copy'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowCredentialsModal(false)}
+              className="w-full px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 font-medium transition-colors"
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 // Helper Components
-const NavItem = ({ icon, label, active, onClick }) => (
+const NavItem = ({ icon, label, active, onClick, badge }) => (
   <button
     onClick={onClick}
-    className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group ${active ? 'bg-sky-50 text-sky-600 font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium'}`}
+    className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group w-full ${active ? 'bg-sky-50 text-sky-600 font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium'}`}
   >
     <span className={`${active ? 'text-sky-600' : 'text-gray-400 group-hover:text-sky-600 transition-colors'}`}>{icon}</span>
-    <span>{label}</span>
+    <span className="flex-1 text-left">{label}</span>
+    {badge > 0 && (
+      <span className="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg ring-2 ring-white">
+        {badge}
+      </span>
+    )}
   </button>
 );
 
