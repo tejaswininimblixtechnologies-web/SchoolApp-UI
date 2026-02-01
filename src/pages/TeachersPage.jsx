@@ -7,19 +7,19 @@ import {
   Bus,
   DollarSign,
   CalendarCheck,
-  Wrench,
+
   LogOut,
   Search,
   Bell,
   Phone,
   Mail,
-  Plus,
+
   Menu,
   User,
   Briefcase,
   Trash2,
 
- AlertCircle,
+  AlertCircle,
   X,
   Edit,
   Settings,
@@ -71,7 +71,7 @@ const TeachersPage = ({ onLogout }) => {
         const result = await response.json();
         if (result.success) {
           const staffUsers = result.users.filter(user => user.role === 'teacher' || user.role === 'staff');
-          
+
           const mappedTeachers = staffUsers.filter(u => u.role === 'teacher').map(user => ({
             id: user.id,
             name: `${user.firstName} ${user.lastName}`,
@@ -162,9 +162,9 @@ const TeachersPage = ({ onLogout }) => {
   const displayedStaff = activeTab === 'teaching' ? teachers : nonTeachingStaff;
   const filteredStaff = displayedStaff.filter(person => {
     const matchesSearch = person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    person.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (activeTab === 'teaching' ? person.subject.toLowerCase().includes(searchTerm.toLowerCase()) : person.role.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesFilter = activeTab === 'teaching' 
+      person.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (activeTab === 'teaching' ? person.subject.toLowerCase().includes(searchTerm.toLowerCase()) : person.role.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesFilter = activeTab === 'teaching'
       ? (selectedFilter === 'All Subjects' || person.subject === selectedFilter)
       : (selectedFilter === 'All Departments' || person.department === selectedFilter);
     return matchesSearch && matchesFilter;
@@ -183,10 +183,10 @@ const TeachersPage = ({ onLogout }) => {
   );
 
   const handleExportCSV = () => {
-    const headers = activeTab === 'teaching' 
+    const headers = activeTab === 'teaching'
       ? ['ID', 'Name', 'Email', 'Phone', 'Subject', 'Classes']
       : ['ID', 'Name', 'Email', 'Phone', 'Role', 'Department'];
-    
+
     const csvRows = [
       headers.join(','),
       ...filteredStaff.map(person => {
@@ -389,7 +389,7 @@ const TeachersPage = ({ onLogout }) => {
 
       {/* Overlay for mobile */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
@@ -500,19 +500,19 @@ const TeachersPage = ({ onLogout }) => {
                       className="w-16 h-16 rounded-full border-2 border-white shadow-sm"
                     />
                     <div className="flex gap-2">
-                      <button 
+                      <button
                         onClick={() => handleViewProfile(person)}
                         className="p-2 text-text-secondary hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                       >
                         <Eye size={18} />
                       </button>
-                      <button 
+                      <button
                         onClick={() => openEditModal(person)}
                         className="p-2 text-text-secondary hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       >
                         <Edit size={18} />
                       </button>
-                      <button 
+                      <button
                         onClick={() => confirmDelete(person)}
                         className="p-2 text-text-secondary hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       >
@@ -628,7 +628,7 @@ const TeachersPage = ({ onLogout }) => {
                     required
                     className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                     value={newStaff.firstName}
-                    onChange={(e) => setNewStaff({...newStaff, firstName: e.target.value})}
+                    onChange={(e) => setNewStaff({ ...newStaff, firstName: e.target.value })}
                     placeholder="John"
                   />
                 </div>
@@ -639,7 +639,7 @@ const TeachersPage = ({ onLogout }) => {
                     required
                     className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                     value={newStaff.lastName}
-                    onChange={(e) => setNewStaff({...newStaff, lastName: e.target.value})}
+                    onChange={(e) => setNewStaff({ ...newStaff, lastName: e.target.value })}
                     placeholder="Doe"
                   />
                 </div>
@@ -652,7 +652,7 @@ const TeachersPage = ({ onLogout }) => {
                     required
                     className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                     value={newStaff.email}
-                    onChange={(e) => setNewStaff({...newStaff, email: e.target.value})}
+                    onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })}
                     placeholder="john@example.com"
                   />
                 </div>
@@ -663,7 +663,7 @@ const TeachersPage = ({ onLogout }) => {
                     required
                     className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                     value={newStaff.phone}
-                    onChange={(e) => setNewStaff({...newStaff, phone: e.target.value})}
+                    onChange={(e) => setNewStaff({ ...newStaff, phone: e.target.value })}
                     placeholder="9876543210"
                   />
                 </div>
@@ -677,7 +677,7 @@ const TeachersPage = ({ onLogout }) => {
                       required
                       className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                       value={newStaff.subject}
-                      onChange={(e) => setNewStaff({...newStaff, subject: e.target.value})}
+                      onChange={(e) => setNewStaff({ ...newStaff, subject: e.target.value })}
                       placeholder="Mathematics"
                     />
                   </div>
@@ -687,7 +687,7 @@ const TeachersPage = ({ onLogout }) => {
                       required
                       className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                       value={newStaff.designation}
-                      onChange={(e) => setNewStaff({...newStaff, designation: e.target.value})}
+                      onChange={(e) => setNewStaff({ ...newStaff, designation: e.target.value })}
                     >
                       <option value="">Select Designation</option>
                       <option value="Teacher">Teacher</option>
@@ -706,7 +706,7 @@ const TeachersPage = ({ onLogout }) => {
                     type="text"
                     className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                     value={newStaff.classes}
-                    onChange={(e) => setNewStaff({...newStaff, classes: e.target.value})}
+                    onChange={(e) => setNewStaff({ ...newStaff, classes: e.target.value })}
                     placeholder="e.g., Grade 10-A, Grade 11-B"
                   />
                 </div>
@@ -721,7 +721,7 @@ const TeachersPage = ({ onLogout }) => {
                       required
                       className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                       value={newStaff.role}
-                      onChange={(e) => setNewStaff({...newStaff, role: e.target.value})}
+                      onChange={(e) => setNewStaff({ ...newStaff, role: e.target.value })}
                       placeholder="e.g., Librarian"
                     />
                   </div>
@@ -732,7 +732,7 @@ const TeachersPage = ({ onLogout }) => {
                       required
                       className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                       value={newStaff.department}
-                      onChange={(e) => setNewStaff({...newStaff, department: e.target.value})}
+                      onChange={(e) => setNewStaff({ ...newStaff, department: e.target.value })}
                       placeholder="e.g., Library"
                     />
                   </div>
@@ -780,7 +780,7 @@ const TeachersPage = ({ onLogout }) => {
                   </span>
                 </div>
               </div>
-              
+
               <div className="space-y-3">
                 <div>
                   <label className="text-xs font-semibold text-gray-500 uppercase">Contact Information</label>
@@ -882,7 +882,7 @@ const TeachersPage = ({ onLogout }) => {
               <p className="text-gray-600 mb-4">
                 Credentials have been generated.
               </p>
-              
+
               <div className="w-full bg-gray-50 rounded-xl p-4 text-left space-y-3 border border-gray-100">
                 <div>
                   <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">Login ID</p>
@@ -940,11 +940,10 @@ const NavItem = ({ icon, label, active, onClick, badge }) => (
 const SubNavItem = ({ label, onClick, active }) => (
   <button
     onClick={onClick}
-    className={`flex items-center w-full pl-14 pr-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium ${
-      active 
-        ? 'text-sky-600 font-bold bg-sky-50' 
+    className={`flex items-center w-full pl-14 pr-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium ${active
+        ? 'text-sky-600 font-bold bg-sky-50'
         : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-    }`}
+      }`}
   >
     <span className={`w-1.5 h-1.5 rounded-full mr-3 ${active ? 'bg-sky-600' : 'bg-gray-300'}`}></span>
     {label}

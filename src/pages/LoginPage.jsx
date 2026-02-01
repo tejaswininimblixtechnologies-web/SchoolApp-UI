@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff, Lock, Mail, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
-import { useDebounce } from '../utils/useDebounce';
+import { Eye, EyeOff, Mail, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -24,8 +24,8 @@ const LoginPage = () => {
     try {
       // Check if this is an admin login attempt (you might want to add a role selector or detect admin emails)
       const isAdminLogin = formData.email.toLowerCase().includes('admin') ||
-                          formData.email.toLowerCase().includes('shilpa') ||
-                          formData.email.toLowerCase().includes('priya');
+        formData.email.toLowerCase().includes('shilpa') ||
+        formData.email.toLowerCase().includes('priya');
 
       let loginEndpoint = 'http://localhost:5000/api/login';
       let loginData = {
@@ -88,7 +88,7 @@ const LoginPage = () => {
           case 'parent': navigate('/parent'); break;
           case 'teacher': navigate('/teacher'); break;
           case 'staff': navigate('/staff'); break;
-          case 'staff': 
+          case 'staff':
             // Check if staff is teaching or non-teaching
             if (user.staffType === 'teaching' || ['Principal', 'HOD', 'Class Teacher', 'Subject Teacher', 'Teacher'].includes(user.designation)) {
               navigate('/teacher');
